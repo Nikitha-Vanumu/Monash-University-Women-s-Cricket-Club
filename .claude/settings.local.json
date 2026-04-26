@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk 'NR>=590 && NR<=620 {print NR\": \"length\\($0\\)\" chars: \"substr\\($0,1,80\\)}' \"c:/Users/nikit/Downloads/MUWCC_Landing_page \\(1\\).html\")",
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "Bash(rm -f \"c:/Users/nikit/OneDrive/Desktop/Monash University Women's Cricket Club/serve.mjs\")",
+      "Bash(rm -f \"c:/Users/nikit/OneDrive/Desktop/Monash University Women's Cricket Club/screenshot.mjs\")",
+      "Bash(rm -rf \"c:/Users/nikit/OneDrive/Desktop/Monash University Women's Cricket Club/temporary screenshots\")",
+      "Bash(rm -rf \"c:/Users/nikit/OneDrive/Desktop/Monash University Women's Cricket Club/Screenshots/node_modules\")",
+      "Bash(rm -f \"c:/Users/nikit/OneDrive/Desktop/Monash University Women's Cricket Club/Screenshots/package.json\")"
+    ]
+  }
+}
