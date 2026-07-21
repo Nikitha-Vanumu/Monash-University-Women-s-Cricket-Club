@@ -86,6 +86,25 @@ function wrapSymbol(s){if(s.y>H+80){s.y=-80;s.x=rand(-60,W+60);}if(s.x>W+80)s.x=
 function animate(){ctx.clearRect(0,0,W,H);symbols.forEach(s=>{s.x+=s.vx;s.y+=s.vy;s.angle+=s.spinSpeed;wrapSymbol(s);if(s.type==='bat')drawBat(s.x,s.y,s.size,s.angle,s.alpha);else if(s.type==='ball')drawBall(s.x,s.y,s.size,s.angle,s.alpha);else drawWickets(s.x,s.y,s.size,s.angle,s.alpha);});requestAnimationFrame(animate);}
 animate();
 
+// ── Fixtures section background canvas ──
+(function(){
+  const fc=document.getElementById('fixtures-bgc');
+  if(!fc)return;
+  const fc2=fc.getContext('2d'),wrap2=fc.parentElement;
+  let FW,FH;
+  function fresize(){FW=fc.width=wrap2.offsetWidth;FH=fc.height=wrap2.offsetHeight;}
+  fresize();window.addEventListener('resize',fresize);
+  const fsymbols=[];
+  function finitSymbols(){fsymbols.length=0;for(let i=0;i<22;i++){const type=TYPES[i%3];fsymbols.push({type,x:rand(-60,FW+60),y:rand(-60,FH+60),size:type==='ball'?rand(16,32):rand(44,72),angle:rand(0,Math.PI*2),spinSpeed:rand(-0.003,0.003),vx:rand(-0.15,0.15),vy:rand(0.08,0.22),alpha:rand(0.25,0.55)});}}
+  finitSymbols();
+  function fwrap(s){if(s.y>FH+80){s.y=-80;s.x=rand(-60,FW+60);}if(s.x>FW+80)s.x=-80;if(s.x<-80)s.x=FW+80;}
+  function fdrawBat(x,y,s,a,al){fc2.save();fc2.translate(x,y);fc2.rotate(a);fc2.globalAlpha=al;fc2.strokeStyle='#fff';fc2.lineWidth=1.8;const bw=s*0.38,bh=s*0.72;fc2.beginPath();fc2.roundRect(-bw/2,-bh*0.1,bw,bh,s*0.08);fc2.stroke();const hw=s*0.1,hh=s*0.34;fc2.beginPath();fc2.rect(-hw/2,-bh*0.1-hh,hw,hh);fc2.stroke();for(let i=0;i<4;i++){const gy=-bh*0.1-hh+(hh/5)*(i+1);fc2.beginPath();fc2.moveTo(-hw/2,gy);fc2.lineTo(hw/2,gy);fc2.stroke();}fc2.restore();}
+  function fdrawBall(x,y,r,a,al){fc2.save();fc2.translate(x,y);fc2.rotate(a);fc2.globalAlpha=al;fc2.strokeStyle='#fff';fc2.lineWidth=1.8;fc2.beginPath();fc2.arc(0,0,r,0,Math.PI*2);fc2.stroke();fc2.beginPath();fc2.moveTo(-r,0);fc2.bezierCurveTo(-r*0.3,-r*0.5,r*0.3,-r*0.5,r,0);fc2.stroke();fc2.beginPath();fc2.moveTo(-r,0);fc2.bezierCurveTo(-r*0.3,r*0.5,r*0.3,r*0.5,r,0);fc2.stroke();fc2.restore();}
+  function fdrawWickets(x,y,s,a,al){fc2.save();fc2.translate(x,y);fc2.rotate(a);fc2.globalAlpha=al;fc2.strokeStyle='#fff';fc2.lineWidth=1.8;const sh=s,gap=s*0.275;for(let i=-1;i<=1;i++){fc2.beginPath();fc2.moveTo(i*gap,0);fc2.lineTo(i*gap,-sh);fc2.stroke();fc2.beginPath();fc2.arc(i*gap,-sh,s*0.055,0,Math.PI*2);fc2.stroke();}fc2.beginPath();fc2.moveTo(-gap-s*0.04,-sh+s*0.04);fc2.lineTo(s*0.04,-sh+s*0.04);fc2.stroke();fc2.beginPath();fc2.moveTo(-s*0.04,-sh+s*0.04);fc2.lineTo(gap+s*0.04,-sh+s*0.04);fc2.stroke();fc2.restore();}
+  function fanimate(){fc2.clearRect(0,0,FW,FH);fsymbols.forEach(s=>{s.x+=s.vx;s.y+=s.vy;s.angle+=s.spinSpeed;fwrap(s);if(s.type==='bat')fdrawBat(s.x,s.y,s.size,s.angle,s.alpha);else if(s.type==='ball')fdrawBall(s.x,s.y,s.size,s.angle,s.alpha);else fdrawWickets(s.x,s.y,s.size,s.angle,s.alpha);});requestAnimationFrame(fanimate);}
+  fanimate();
+})();
+
 // ── Smooth momentum scroll for history section ──
 const scroller=document.getElementById('scroller'),track=document.getElementById('track');
 let isDown=false, startX=0, curX=0, targetX=0, velX=0, lastX=0, lastT=0, rafId=null;
@@ -188,3 +207,66 @@ scroller.addEventListener('wheel', e => {
   targetX = clamp(targetX - e.deltaY * 1.4);
   startMomentum();
 }, {passive:false});
+
+// ── Join modal ──
+(function () {
+  const modal = document.getElementById('joinModal');
+  const closeBtn = document.getElementById('modalClose');
+  const form = document.getElementById('join-form');
+  const submitBtn = document.getElementById('modal-submit-btn');
+  const formContainer = document.getElementById('modal-form-container');
+  const successMsg = document.getElementById('modal-success-msg');
+
+  function openModal() {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('[href="#join"]').forEach(el => {
+    el.addEventListener('click', e => { e.preventDefault(); openModal(); });
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    submitBtn.textContent = 'Sending…';
+    submitBtn.disabled = true;
+    fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { Accept: 'application/json' }
+    })
+      .then(() => { formContainer.style.display = 'none'; successMsg.style.display = 'block'; })
+      .catch(() => { formContainer.style.display = 'none'; successMsg.style.display = 'block'; });
+  });
+})();
+
+// ── Mobile hamburger menu ──
+const navHamburger = document.getElementById('navHamburger');
+const navLinks = document.getElementById('navLinks');
+
+navHamburger.addEventListener('click', () => {
+  navHamburger.classList.toggle('open');
+  navLinks.classList.toggle('open');
+  document.body.style.overflow = navLinks.classList.contains('open') ? 'hidden' : '';
+});
+
+navLinks.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    navHamburger.classList.remove('open');
+    navLinks.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+});
