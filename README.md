@@ -29,6 +29,8 @@ Built as a freelance project for the club. Content and images belong to Monash U
 
 <img width="2556" height="1176" alt="Training-page" src="https://github.com/user-attachments/assets/643e323f-1f3d-4cbe-b906-fad8c58671a5" />
 
+<img width="2541" height="1170" alt="History" src="https://github.com/user-attachments/assets/37cead5e-f8aa-48e1-8662-5813fead8351" />
+
 <img width="2553" height="1023" alt="Socials" src="https://github.com/user-attachments/assets/65401047-a573-4d01-89b6-febc953698a5" />
 
 
