@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://incredible-malabi-cadd2b.netlify.app/sitemap.xml

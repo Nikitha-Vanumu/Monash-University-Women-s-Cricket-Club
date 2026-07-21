@@ -1,4 +1,5 @@
-﻿const hero = document.getElementById('hero');
+
+const hero = document.getElementById('home');
 const slides = document.querySelectorAll('.slide');
 const dots = document.querySelectorAll('.dot');
 const progressBar = document.getElementById('progressBar');
@@ -71,7 +72,7 @@ hero.addEventListener('touchend', e => {
   if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); startAuto(); }
 });
 
-const canvas=document.getElementById('bgc'),ctx=canvas.getContext('2d'),wrap=document.getElementById('scroller');
+const canvas=document.getElementById('bgc'),ctx=canvas.getContext('2d'),wrap=document.getElementById('history');
 let W,H;
 function resize(){W=canvas.width=wrap.offsetWidth;H=canvas.height=wrap.offsetHeight;}
 resize();window.addEventListener('resize',resize);
@@ -95,7 +96,7 @@ animate();
   function fresize(){FW=fc.width=wrap2.offsetWidth;FH=fc.height=wrap2.offsetHeight;}
   fresize();window.addEventListener('resize',fresize);
   const fsymbols=[];
-  function finitSymbols(){fsymbols.length=0;for(let i=0;i<22;i++){const type=TYPES[i%3];fsymbols.push({type,x:rand(-60,FW+60),y:rand(-60,FH+60),size:type==='ball'?rand(16,32):rand(44,72),angle:rand(0,Math.PI*2),spinSpeed:rand(-0.003,0.003),vx:rand(-0.15,0.15),vy:rand(0.08,0.22),alpha:rand(0.25,0.55)});}}
+  function finitSymbols(){fsymbols.length=0;for(let i=0;i<22;i++){const type=TYPES[i%3];fsymbols.push({type,x:rand(-60,FW+60),y:rand(-60,FH+60),size:type==='ball'?rand(8,16):rand(22,36),angle:rand(0,Math.PI*2),spinSpeed:rand(-0.003,0.003),vx:rand(-0.15,0.15),vy:rand(0.08,0.22),alpha:rand(0.25,0.55)});}}
   finitSymbols();
   function fwrap(s){if(s.y>FH+80){s.y=-80;s.x=rand(-60,FW+60);}if(s.x>FW+80)s.x=-80;if(s.x<-80)s.x=FW+80;}
   function fdrawBat(x,y,s,a,al){fc2.save();fc2.translate(x,y);fc2.rotate(a);fc2.globalAlpha=al;fc2.strokeStyle='#fff';fc2.lineWidth=1.8;const bw=s*0.38,bh=s*0.72;fc2.beginPath();fc2.roundRect(-bw/2,-bh*0.1,bw,bh,s*0.08);fc2.stroke();const hw=s*0.1,hh=s*0.34;fc2.beginPath();fc2.rect(-hw/2,-bh*0.1-hh,hw,hh);fc2.stroke();for(let i=0;i<4;i++){const gy=-bh*0.1-hh+(hh/5)*(i+1);fc2.beginPath();fc2.moveTo(-hw/2,gy);fc2.lineTo(hw/2,gy);fc2.stroke();}fc2.restore();}
@@ -106,7 +107,7 @@ animate();
 })();
 
 // ── Smooth momentum scroll for history section ──
-const scroller=document.getElementById('scroller'),track=document.getElementById('track');
+const scroller=document.getElementById('history'),track=document.getElementById('track');
 let isDown=false, startX=0, curX=0, targetX=0, velX=0, lastX=0, lastT=0, rafId=null;
 
 function clamp(v){ return Math.max(-(track.scrollWidth - scroller.clientWidth), Math.min(0, v)); }
@@ -270,3 +271,150 @@ navLinks.querySelectorAll('a').forEach(link => {
     document.body.style.overflow = '';
   });
 });
+
+// ── Fixtures & Results ──
+(function () {
+  const root = document.getElementById('fixtures-root');
+  if (!root) return;
+
+  const TEAM_LABELS = {
+    'b5ef3909': "CV Women's",
+    'feab48ee': 'Southern Bayside',
+  };
+
+  const PLAYHQ_LINKS = [
+    {
+      href: 'https://www.playhq.com/cricket-australia/org/monash-university-cricket-club/43ca56f3/cv-womens-community-cricket-competition-summer-202526/teams/monash-uni-noble-park-women/b5ef3909',
+      comp: "CV Women's Community Cricket",
+      season: 'Summer 2025/26',
+    },
+    {
+      href: 'https://www.playhq.com/cricket-australia/org/monash-university-cricket-club/43ca56f3/cricket-southern-bayside-womens-summer-202526/teams/monash-uni-noble-park/feab48ee',
+      comp: "Cricket Southern Bayside Women's",
+      season: 'Summer 2025/26',
+    },
+  ];
+
+  function fallback() {
+    return `
+      <div class="fixtures-playhq-links">
+        <p class="fixtures-playhq-label">Results are hosted on PlayHQ — updated in real time.</p>
+        <div class="fixtures-playhq-cards">
+          ${PLAYHQ_LINKS.map(l => `
+            <a class="fixtures-playhq-card" href="${l.href}" target="_blank" rel="noopener">
+              <span class="fixtures-playhq-comp">${l.comp}</span>
+              <span class="fixtures-playhq-season">${l.season}</span>
+              <span class="fixtures-playhq-cta">View Results ↗</span>
+            </a>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  function outcome(result, teamId) {
+    const isHome = result.homeTeam?.id === teamId;
+    switch (result.result) {
+      case 'HOME_WIN':  return isHome ? 'win' : 'loss';
+      case 'AWAY_WIN':  return isHome ? 'loss' : 'win';
+      case 'TIE':       return 'draw';
+      default:          return 'nr';
+    }
+  }
+
+  function outcomeLabel(o) {
+    return { win: 'Won', loss: 'Lost', draw: 'Draw', nr: 'N/R' }[o] || o;
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+
+  function score(team) {
+    if (!team) return '–';
+    return team.score || team.totalScore || team.runs || '–';
+  }
+
+  function render(results) {
+    if (!results.length) {
+      return `<p class="fixtures-empty">No results recorded yet — check back after round one.</p>
+              ${fallback()}`;
+    }
+
+    // Group by competition
+    const groups = {};
+    results.forEach(r => {
+      const lbl = TEAM_LABELS[r._teamId] || r._label;
+      (groups[lbl] = groups[lbl] || []).push(r);
+    });
+    const comps = Object.keys(groups);
+
+    let html = '';
+
+    if (comps.length > 1) {
+      html += `<div class="fixtures-filter-row">
+        <button class="filter-btn active" data-filter="all">All</button>
+        ${comps.map(c => `<button class="filter-btn" data-filter="${c}">${c}</button>`).join('')}
+      </div>`;
+    }
+
+    html += `<div class="results-list">`;
+    comps.forEach(comp => {
+      if (comps.length > 1) {
+        html += `<div class="round-header results-comp-header" data-comp="${comp}">${comp}</div>`;
+      }
+      groups[comp].forEach(r => {
+        const o            = outcome(r, r._teamId);
+        const roundLbl     = r.round?.name || (r.round?.roundNumber ? `R${r.round.roundNumber}` : '');
+        const venue        = r.venue?.name || '';
+        const dateStr      = fmtDate(r.startTime);
+        const isMonashHome = r.homeTeam?.id === r._teamId;
+        html += `
+          <div class="fixture-card result-card" data-comp="${comp}">
+            <div class="fc-header">
+              <span class="fc-round">${roundLbl}</span>
+              <span class="outcome-pill outcome-${o}">${outcomeLabel(o)}</span>
+            </div>
+            <div class="fc-team${isMonashHome ? ' fc-team-ours' : ''}">
+              <span class="fc-team-name">${r.homeTeam?.name || '–'}</span>
+              <span class="fc-score">${score(r.homeTeam)}</span>
+            </div>
+            <div class="fc-team${!isMonashHome ? ' fc-team-ours' : ''}">
+              <span class="fc-team-name">${r.awayTeam?.name || '–'}</span>
+              <span class="fc-score">${score(r.awayTeam)}</span>
+            </div>
+            <div class="fc-footer">
+              ${dateStr ? `<span>${dateStr}</span>` : ''}
+              ${venue ? `<span class="fc-venue">${venue}</span>` : ''}
+            </div>
+          </div>`;
+      });
+    });
+    html += `</div>`;
+
+    html += `<div class="results-playhq-footer">
+      ${PLAYHQ_LINKS.map(l => `<a href="${l.href}" target="_blank" rel="noopener" class="results-playhq-link">${l.comp} ↗</a>`).join('')}
+    </div>`;
+
+    return html;
+  }
+
+  root.innerHTML = `<p class="fixtures-loading">Loading results…</p>`;
+
+  fetch('/.netlify/functions/results')
+    .then(r => r.json())
+    .then(json => {
+      root.innerHTML = render(json.data || []);
+
+      root.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          root.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.dataset.filter;
+          root.querySelectorAll('.result-card, .results-comp-header').forEach(el => {
+            el.style.display = (filter === 'all' || el.dataset.comp === filter) ? '' : 'none';
+          });
+        });
+      });
+    })
+    .catch(() => { root.innerHTML = fallback(); });
+})();

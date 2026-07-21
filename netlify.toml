@@ -1,0 +1,21 @@
+[build]
+  functions = "netlify/functions"
+  publish   = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Prevent clickjacking
+    X-Frame-Options = "DENY"
+    # Prevent MIME-type sniffing
+    X-Content-Type-Options = "nosniff"
+    # Legacy XSS filter for older browsers
+    X-XSS-Protection = "1; mode=block"
+    # Limit referrer info sent cross-origin
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Force HTTPS for 2 years, include subdomains, submit to preload list
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    # Disable unnecessary browser features
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+    # Content Security Policy
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://formspree.io; media-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self';"
