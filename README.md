@@ -26,9 +26,9 @@ A modern, full-featured website for the Monash University Women's Cricket Club â
 Built as a freelance project for the club. Content and images belong to Monash University Women's Cricket Club.
 
 ## Screenshots
-<img width="2532" height="1183" alt="home-page" src="https://github.com/user-attachments/assets/47adfe87-769f-4124-b845-9d993348fbac" />
 
 <img width="2556" height="1176" alt="Training-page" src="https://github.com/user-attachments/assets/643e323f-1f3d-4cbe-b906-fad8c58671a5" />
+
 <img width="2553" height="1023" alt="Socials" src="https://github.com/user-attachments/assets/65401047-a573-4d01-89b6-febc953698a5" />
 
 
