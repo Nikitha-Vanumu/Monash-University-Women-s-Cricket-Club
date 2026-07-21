@@ -3,7 +3,7 @@
 
 # Monash University Women's Cricket Club
 
-A modern, full-featured website for the Monash University Women's Cricket Club — built to showcase the club's history, training programs, and season activity to members, prospective players, and the wider community.
+A modern, full-featured website for the Monash University Women's Cricket Club built to showcase the club's history, training programs, and season activity to members, prospective players, and the wider community.
 
 🔗 **Live site:** [muwcc.netlify.app](https://muwcc.netlify.app/)
 
